@@ -15,5 +15,44 @@ services:
       timeout: 5s
       retries: 20
 
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://rag:${POSTGRES_PASSWORD:-rag}@db:5432/rag
+      JWT_SECRET: ${JWT_SECRET:-dev-only-insecure-secret-change-me-0123}
+      ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-15}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-hash}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-}
+      EMBEDDING_DIM: ${EMBEDDING_DIM:-768}
+      LLM_PROVIDER: ${LLM_PROVIDER:-extractive}
+      LLM_MODEL: ${LLM_MODEL:-}
+      SIMILARITY_THRESHOLD: ${SIMILARITY_THRESHOLD:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      S3_BUCKET: ${S3_BUCKET:-}
+      AWS_REGION: ${AWS_REGION:-}
+      SAMPLE_DOCS_DIR: /app/sample_docs
+    command: >
+      sh -c "python -m app.cli seed-demo && exec uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    volumes:
+      - storage:/app/storage
+      - ./sample_docs:/app/sample_docs:ro
+    ports:
+      - "127.0.0.1:8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
 volumes:
   pgdata:
+  storage:
