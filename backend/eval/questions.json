@@ -1,0 +1,17 @@
+[
+  {"question": "How many days of annual leave do I get?", "expected": "Employee handbook"},
+  {"question": "Can I carry over unused leave days?", "expected": "Employee handbook"},
+  {"question": "How many days a week can I work remotely?", "expected": "Employee handbook"},
+  {"question": "How long is parental leave for non-birthing parents?", "expected": "Employee handbook"},
+  {"question": "When do I need a doctor's note for sick leave?", "expected": "Employee handbook"},
+  {"question": "What is the hotel cap per night in Tokyo?", "expected": "Expense policy"},
+  {"question": "How much can I spend on meals while travelling?", "expected": "Expense policy"},
+  {"question": "How long do I have to submit an expense claim?", "expected": "Expense policy"},
+  {"question": "When does the on-call rotation hand over?", "expected": "On-call runbook"},
+  {"question": "How do I fail over the database?", "expected": "On-call runbook"},
+  {"question": "What counts as a SEV1 incident?", "expected": "On-call runbook"},
+  {"question": "What are the salary bands for senior engineers?", "expected": "Salary bands 2026"},
+  {"question": "How much did salary bands increase compared with last year?", "expected": "Salary bands 2026"},
+  {"question": "What raise does a rating of 4 receive?", "expected": "Performance review guide"},
+  {"question": "How long is a performance improvement plan?", "expected": "Performance review guide"}
+]
