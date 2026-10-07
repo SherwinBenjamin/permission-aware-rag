@@ -1,0 +1,7 @@
+[
+  {"file": "employee_handbook.md", "title": "Employee handbook", "roles": ["all-staff", "engineering", "hr"]},
+  {"file": "expense_policy.md", "title": "Expense policy", "roles": ["all-staff"]},
+  {"file": "oncall_runbook.md", "title": "On-call runbook", "roles": ["engineering"]},
+  {"file": "salary_bands_2026.md", "title": "Salary bands 2026", "roles": ["hr"]},
+  {"file": "performance_review_guide.md", "title": "Performance review guide", "roles": ["hr"]}
+]
