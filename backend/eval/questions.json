@@ -13,5 +13,9 @@
   {"question": "What are the salary bands for senior engineers?", "expected": "Salary bands 2026"},
   {"question": "How much did salary bands increase compared with last year?", "expected": "Salary bands 2026"},
   {"question": "What raise does a rating of 4 receive?", "expected": "Performance review guide"},
-  {"question": "How long is a performance improvement plan?", "expected": "Performance review guide"}
+  {"question": "How long is a performance improvement plan?", "expected": "Performance review guide"},
+  {"question": "What is the capital of France?", "expected": null},
+  {"question": "How do I bake sourdough bread?", "expected": null},
+  {"question": "Who won the football match last night?", "expected": null},
+  {"question": "What will the weather be tomorrow?", "expected": null}
 ]

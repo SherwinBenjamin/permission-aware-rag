@@ -122,27 +122,45 @@ def cmd_ask(db: Session, args: argparse.Namespace) -> None:
 
 
 def cmd_eval(db: Session, args: argparse.Namespace) -> None:
-    """Report how often the expected document appears in the top-k permitted results."""
+    """Report retrieval hit rates, and the similarity gap the refusal threshold must sit in.
+
+    Cases with "expected": null are off-topic and should be refused.
+    """
     settings = get_settings()
     embedder = make_embedder(settings)
     user = find_user(db, args.user)
     cases = json.loads(Path(args.file).read_text())
+    answerable = [c for c in cases if c["expected"]]
     top1 = hits = 0
+    relevant_best, off_topic_best = [], []
     for case in cases:
         [embedding] = embedder.embed([case["question"]])
-        titles = [c.title for c in search(db, user.id, embedding, settings.top_k)]
-        hit = case["expected"] in titles
-        hits += hit
-        top1 += bool(titles) and titles[0] == case["expected"]
+        results = search(db, user.id, embedding, settings.top_k)
+        titles = [c.title for c in results]
+        best = results[0].similarity if results else 0.0
+        if case["expected"] is None:
+            off_topic_best.append(best)
+            hit = best < settings.threshold
+        else:
+            relevant_best.append(best)
+            hit = case["expected"] in titles
+            hits += hit
+            top1 += bool(titles) and titles[0] == case["expected"]
         if args.verbose or not hit:
             mark = "ok  " if hit else "MISS"
-            print(f"{mark} {case['question']!r} -> {titles[:3]}")
-    n = len(cases)
+            print(f"{mark} {best:.3f} {case['question']!r} -> {titles[:3]}")
+    n = len(answerable)
     print(
-        f"hit@1: {top1}/{n} ({top1 / n:.0%})  hit@{settings.top_k}: {hits}/{n} ({hits / n:.0%})  "
+        f"hit@1: {top1}/{n}  hit@{settings.top_k}: {hits}/{n}  "
         f"chunk_size={settings.chunk_size} overlap={settings.chunk_overlap} "
         f"embedder={settings.embedding_provider}"
     )
+    if relevant_best and off_topic_best:
+        print(
+            f"lowest relevant best-match: {min(relevant_best):.3f}  "
+            f"highest off-topic best-match: {max(off_topic_best):.3f}  "
+            f"threshold: {settings.threshold:.3f}"
+        )
 
 
 def roles_arg(value: str) -> list[str]:
