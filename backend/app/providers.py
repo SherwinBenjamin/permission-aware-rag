@@ -105,25 +105,26 @@ class ExtractiveLLM:
     def complete(self, system: str, user: str) -> str:
         question = user.rsplit("Question:", 1)[-1]
         wanted = set(content_tokens(question))
-        scored: dict[str, tuple[int, str]] = {}
+        scored: dict[frozenset[str], tuple[int, str, str]] = {}
         for source_id, body in self.SOURCE.findall(user):
             for line in body.splitlines():
                 if line.lstrip().startswith(("#", "| ---")):
                     continue
                 for sentence in self.SENTENCE.split(line.strip(" -*|")):
-                    overlap = len(wanted & set(content_tokens(sentence)))
+                    words = frozenset(content_tokens(sentence))
+                    overlap = len(wanted & words)
                     if not overlap or len(sentence.split()) < 4:
                         continue
-                    # Chunk overlap cuts sentences; keep only the longest copy.
-                    if any(sentence in seen for seen in scored):
+                    # Chunk overlap cuts sentences; keep only the most complete copy.
+                    if any(words <= seen for seen in scored):
                         continue
-                    for seen in [s for s in scored if s in sentence]:
+                    for seen in [s for s in scored if s < words]:
                         del scored[seen]
-                    scored[sentence] = (overlap, source_id)
+                    scored[words] = (overlap, sentence, source_id)
         if not scored:
             return "I couldn't find that in the documents you have access to."
-        best = sorted(scored.items(), key=lambda item: -item[1][0])[:2]
-        return " ".join(f"{sentence} [{source_id}]" for sentence, (_, source_id) in best)
+        best = sorted(scored.values(), key=lambda item: -item[0])[:2]
+        return " ".join(f"{sentence} [{source_id}]" for _, sentence, source_id in best)
 
 
 class OpenAILLM:
