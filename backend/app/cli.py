@@ -92,16 +92,17 @@ def cmd_ingest(db: Session, args: argparse.Namespace) -> None:
 
 
 def cmd_seed_demo(db: Session, args: argparse.Namespace) -> None:
+    if db.scalar(select(func.count()).select_from(User)):
+        print("database already has users; skipping demo seed")
+        return
     for role in DEMO_ROLES:
         get_or_create_role(db, role)
     for email, is_admin, roles in DEMO_USERS:
         upsert_user(db, email, args.password, is_admin, roles)
     db.commit()
     directory = sample_docs_dir()
-    existing = set(db.scalars(select(Document.title)))
     for entry in json.loads((directory / "manifest.json").read_text()):
-        if entry["title"] not in existing:
-            ingest_file(db, directory / entry["file"], entry["title"], entry["roles"])
+        ingest_file(db, directory / entry["file"], entry["title"], entry["roles"])
     print("demo users:", ", ".join(email for email, *_ in DEMO_USERS))
 
 
