@@ -1,5 +1,7 @@
 # Permission-Aware RAG Assistant
 
+[![CI](https://github.com/SherwinBenjamin/permission-aware-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/SherwinBenjamin/permission-aware-rag/actions/workflows/ci.yml)
+
 A document Q&A assistant where each user only gets answers drawn from documents their roles are allowed to see. The permission check runs **inside the database query**, so restricted text never reaches the LLM, and every answer cites the documents it came from.
 
 Most RAG demos give the chatbot every document. In a real company that lets anyone ask about salaries or confidential plans. This project treats retrieval as an access-control problem.
